@@ -1,0 +1,19 @@
+//-Página principal inicio del sistema
+extends layout  
+
+block contenido  
+
+  // Bienvenida
+  h1 Bienvenido a Code Solutions
+  p Sistema de gestión de proyectos
+
+  // Menú principal 
+  .menu
+    // Botón para ir a empleados
+    a.btn(href="/empleados") Gestionar Empleados
+    
+    // Botón para ir a proyectos
+    a.btn(href="/proyectos") Gestionar Proyectos
+    
+    // Botón para ir a tareas
+    a.btn(href="/tareas") Gestionar Tareas

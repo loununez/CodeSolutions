@@ -1,0 +1,38 @@
+//- Interfaz para que usuarios registren nuevos proyectos
+extends ../layout  
+block contenido  
+
+  // Título del formulario
+  h1 Nuevo Proyecto
+  
+  // Formulario que envía datos a proyectos por método POST
+  form(method="POST" action="/proyectos").mt-3
+    
+    // Grupo para el campo Nombre
+    .form-group.mb-3
+      label(for="nombre") Nombre:
+      input.form-control(
+        type="text" 
+        name="nombre" 
+        required  // Campo obligatorio
+      )
+    
+    // Grupo para el campo Descripción
+    .form-group.mb-3
+      label(for="descripcion") Descripción:
+      textarea.form-control(
+        name="descripcion" 
+        required  // Campo obligatorio
+      )
+    
+    // Grupo para el campo Cliente
+    .form-group.mb-3
+      label(for="cliente") Cliente:
+      input.form-control(
+        type="text" 
+        name="cliente" 
+        required  // Campo obligatorio
+      )
+    
+    // Botón para enviar el formulario
+    button.btn.btn-primary(type="submit") Crear Proyecto

@@ -1,0 +1,30 @@
+//- Plantilla para mostrar la lista de empleados
+extends ../layout 
+
+block contenido  
+
+  // Título de la página
+  h1 Lista de Empleados
+  
+  // Botón para agregar nuevo empleado
+  a.btn(href="/empleados/crear") Nuevo Empleado
+
+  // Tabla que muestra los empleados
+  table
+    // Encabezados de la tabla
+    thead
+      tr
+        th Nombre
+        th Email
+        th Perfil Técnico
+        th Especialidad
+    
+    // Lista de empleados
+    tbody
+      // Crea una fila de tabla para cada empleado registrado
+      each empleado in empleados
+        tr
+          td= empleado.nombre
+          td= empleado.email
+          td= empleado.perfilTecnico
+          td= empleado.especialidad

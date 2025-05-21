@@ -1,0 +1,23 @@
+//- Página de inicio de sesión
+extends layout 
+
+block contenido 
+
+  // Título de la página
+  h1 Iniciar Sesión
+  
+  // Mostrar mensaje de error si es que existe
+  if error
+    p(style="color: red")= error
+
+  // Formulario de login
+  form(method="POST" action="/auth/login")
+    label(for="username") Usuario:
+    input(type="text" name="username" required)
+    
+    // Campo para la contraseña
+    label(for="password") Contraseña:
+    input(type="password" name="password" required)
+    
+    // Botón para enviar el formulario
+    button(type="submit") Entrar

@@ -1,0 +1,47 @@
+//- Formulario para registrar nuevas tareas
+extends ../layout  
+
+block contenido  
+
+  // Título de la página
+  h1 Registro de Nueva Tarea
+
+  // Mostrar mensaje de error si es que existe
+  if error
+    p.error(style="color: red")= error
+
+  // Formulario de creación
+  form(method="POST" action="/tareas")
+    
+    // Campo ID del Proyecto
+    .form-group
+      label(for="proyectoId") ID Proyecto:
+      input(
+        type="text"
+        name="proyectoId"
+        required
+      )
+    
+    // Campo mombre de la tarea
+    .form-group
+      label(for="nombre") Nombre de la Tarea:
+      input(
+        type="text" 
+        name="nombre"
+        required
+      )
+    
+    // Campo horas registradas
+    .form-group
+      label(for="horasRegistradas") Horas Registradas:
+      input(
+        type="number"
+        name="horasRegistradas"
+        required
+        min="1"
+      )
+    
+    // Botón de envío
+    button.btn(
+      type="submit"
+    ) Guardar Tarea

@@ -1,0 +1,37 @@
+//- Estructura HTML principal
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title= titulo
+    //- Estilos CSS
+    style.
+      body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+      header { background:rgb(255, 255, 255); color: black ; padding: 1rem; }
+      nav { background:rgb(33, 31, 31); padding: 0.5rem; }
+      nav ul { list-style: none; padding: 0; display: flex; gap: 1rem; }
+      nav a { color: white; text-decoration: none; }
+      .container { padding: 1rem; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 0.5rem; border: 1px solid #ddd; }
+      .btn { display: inline-block; padding: 0.5rem 1rem; background:rgb(0, 0, 0); color: white; text-decoration: none; border-radius: 4px; }
+  body
+    header
+      h1 Code Solutions
+
+    //- Barra de navegación principal
+    nav
+      ul
+        li
+          a(href="/") Inicio
+        li
+          a(href="/empleados") Empleados
+        li
+          a(href="/tareas") Tareas 
+        li
+          a(href="/proyectos") Proyectos
+        li
+          a(href="/reportes") Reportes
+    .container
+      block contenido

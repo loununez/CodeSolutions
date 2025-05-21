@@ -1,0 +1,13 @@
+//-Página de error 
+extends layout  
+
+block contenido  
+
+  // Muestra el título de error 
+  h1= titulo || 'Error'
+  
+  // Muestra el mensaje de error en rojo 
+  p(style="color: red")= mensajeError || 'Error'
+  
+  // Botón para regresar a la página principal
+  a.btn(href="/") Volver al inicio

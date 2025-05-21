@@ -1,0 +1,37 @@
+//- Plantilla para registrar nuevos empleados formulario HTML
+extends ../layout  
+
+block contenido  
+
+  // Título principal
+  h1 Registrar Nuevo Empleado
+  
+  // Mostrar mensaje de error si es que existe
+  if error
+    .error(style="color:red")= error  
+
+  // Formulario que envía datos a /empleados por POST
+  form(method="POST" action="/empleados")
+    
+    // Campo para el nombre
+    .form-group
+      label(for="nombre") Nombre:
+      input(type="text" name="nombre" required) 
+    
+    // Campo para el email
+    .form-group
+      label(for="email") Email:
+      input(type="email" name="email" required)  
+    
+    // Campo para el perfil técnico
+    .form-group
+      label(for="perfilTecnico") Perfil Técnico:
+      input(type="text" name="perfilTecnico" required)
+    
+    // Campo para la especialidad
+    .form-group
+      label(for="especialidad") Especialidad:
+      input(type="text" name="especialidad" required)
+    
+    // Botón para enviar el formulario
+    button.btn(type="submit") Guardar Empleado

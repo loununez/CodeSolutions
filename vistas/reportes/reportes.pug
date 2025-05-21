@@ -1,0 +1,63 @@
+//- Página de reportes 
+extends ../layout  
+
+block contenido 
+
+  // Título de la página
+  h1 Reportes del Sistema
+
+  //  Resumen de horas trabajadas
+  section.reporte-seccion
+    h2 
+      i.fas.fa-clock 
+    .dato-principal
+      p Total registrado: 
+        strong #{totalHoras} horas
+
+  // Distribución de trabajo por empleado
+  section.reporte-seccion
+    h2 
+      i.fas.fa-users  
+      | Distribución por Desarrollador
+    if tareasPorEmpleado && tareasPorEmpleado.length > 0
+      table.tabla-reportes
+        thead
+          tr
+            th Nombre
+            th Tareas Asignadas
+            th Horas Invertidas
+        tbody
+          each empleado in tareasPorEmpleado
+            tr
+              td= empleado.nombre
+              td= empleado.cantidad
+              td= empleado.horas + ' horas'
+    else
+      p.aviso No se encontraron registros de trabajo
+
+  // Estado de proyectos
+  section.reporte-seccion
+    h2 
+      i.fas.fa-project-diagram
+    if proyectos && proyectos.length > 0
+      table.tabla-reportes
+        thead
+          tr
+            th Nombre del Proyecto
+            th Cliente
+            th Estado Actual
+        tbody
+          each proyecto in proyectos
+            tr
+              td= proyecto.nombre
+              td= proyecto.cliente
+              td
+                span(class=`estado-${proyecto.estado.toLowerCase()}`)= proyecto.estado
+    else
+      p.aviso No hay proyectos en el sistema
+
+  // Botón de navegación
+  .acciones
+    a.btn.btn-volver(href="/")
+      i.fas.fa-arrow-left
+      | Volver al Inicio

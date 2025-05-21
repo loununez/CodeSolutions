@@ -1,0 +1,38 @@
+//- Vista que muestra todos los proyectos del sistema
+extends ../layout  
+
+block contenido 
+  // Título de la página
+  h1 Lista de Proyectos
+  
+  // Botón para agregar nuevos proyectos
+  
+  a.btn(href="/proyectos/crear") Nuevo Proyecto
+
+  // Verificamos si hay proyectos para mostrar
+
+  if proyectos && proyectos.length > 0
+    // Tabla de proyectos
+    table
+      // Encabezados de la tabla
+      thead
+        tr
+          th Nombre
+          th Descripción
+          th Cliente
+          th Estado
+      
+      // Cuerpo de la tabla
+      tbody
+        // Mostramos cada proyecto válido como fila
+        each proyecto in proyectos
+          - if (proyecto.nombre) 
+            tr
+              td= proyecto.nombre
+              td= proyecto.descripcion
+              td= proyecto.cliente
+              td= proyecto.estado
+  
+      // Mensaje si no hay proyectos
+  else
+    p.aviso No hay proyectos registrados.
