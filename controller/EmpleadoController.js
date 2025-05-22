@@ -1,4 +1,4 @@
-// Importación de módulos necesarios
+// Importación de los modulos
 const fs = require('fs').promises;
 const Empleado = require('../modelos/Empleado'); 
 
@@ -10,11 +10,11 @@ const archivoEmpleados = './datos/empleados.json';
 
 const obtenerEmpleados = async () => {
     try {
-        // Lee y parsea el archivo JSON
+        // Lee el archivo JSON
         const datos = await fs.readFile(archivoEmpleados, 'utf8');
         return JSON.parse(datos);
     } catch (error) {
-        // Si hay error (archivo no existe), crea uno nuevo
+        // Si hay error es decir un archivo no existe, crea uno nuevo
         await fs.writeFile(archivoEmpleados, '[]');
         return []; 
     }
@@ -23,7 +23,7 @@ const obtenerEmpleados = async () => {
 // Exportación de los métodos del controlador
 module.exports = {
     
-     //Lista todos los empleados
+     // Lista todos los empleados
      // Renderiza la vista con los datos obtenidos
     
     listar: async (req, res) => {
@@ -36,16 +36,14 @@ module.exports = {
     },
 
     
-     //Muestra el formulario para crear un nuevo empleado
+     // Muestra el formulario para crear un nuevo empleado
      
     mostrarFormulario: (req, res) => {
         res.render('empleados/crear');
     },
 
-    /**
-     * Crea un nuevo empleado y lo guarda en el archivo JSON
-     * Recibe los datos del formulario (req.body)
-     */
+     // Crea un nuevo empleado y lo guarda en el archivo JSON
+     // Recibe los datos del formulario (req.body)
     crear: async (req, res) => {
         const { nombre, email, perfilTecnico, especialidad } = req.body;
         
@@ -65,7 +63,7 @@ module.exports = {
             // Si falla, muestra el formulario con error
             res.render('empleados/crear', { 
                 error: true,
-                datos: req.body // Conserva los datos ingresados
+                datos: req.body 
             });
         }
     }

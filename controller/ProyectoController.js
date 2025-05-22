@@ -6,11 +6,11 @@ const archivo = './datos/proyectos.json'; // Ruta del archivo de datos
 // Función para obtener todos los proyectos
 const obtenerProyectos = async () => {
   try {
-    // Lee el archivo y convierte el texto JSON a objeto JavaScript
+    // Lee el archivo y convierte el texto JSON 
     const datos = await fs.readFile(archivo, 'utf8');
     return JSON.parse(datos).filter(p => p?.nombre);
   } catch {
-    // Si hay error (archivo no existe), crea uno nuevo vacío
+    // Si hay error, el archivo no existe, crea uno nuevo vacío
     await fs.writeFile(archivo, '[]');
     return [];
   }

@@ -4,7 +4,7 @@ module.exports = {
     // Método para generar y mostrar reportes
     reportes: async (req, res) => {
         try {
-            // Leemos y procesamos tres archivos JSON que son lista de tareas, lista de empleados y lista de proyectos
+            // Leemos y procesamos los archivos JSON que son lista de tareas, lista de empleados y lista de proyectos
             // Si algún archivo no existe o tiene error, usamos array vacío
             const [tareas, empleados, proyectos] = await Promise.all([
                 fs.readFile('./datos/tareas.json', 'utf8').then(JSON.parse).catch(() => []),
