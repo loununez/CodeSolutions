@@ -10,13 +10,13 @@ const ProyectoController = require('../controller/ProyectoController');
 // Página principal donde muestra todos los proyectos
 router.get('/', ProyectoController.listar);
 
-// Formulario para agregar un proyecto nuevo (CORRECCIÓN: usar mostrarFormularioCrear)
+// Formulario para agregar un proyecto nuevo
 router.get('/crear', ProyectoController.mostrarFormularioCrear);
 
 // Guarda el proyecto nuevo cuando se envía el formulario
 router.post('/', ProyectoController.crear);
 
-// Muestra el formulario para modificar un proyecto (CORRECCIÓN: usar mostrarFormularioEditar)
+// Muestra el formulario para modificar un proyecto
 router.get('/editar/:id', ProyectoController.mostrarFormularioEditar);
 
 // Actualiza los cambios del proyecto

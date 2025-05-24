@@ -58,6 +58,50 @@ module.exports = {
     }
   },
 
+  // Muestra el formulario para editar una tarea - SK
+  mostrarFormularioEditar: async (req, res) => {
+
+    try {
+      const tareas = await leerDatos();
+      const empleados = await leerDatos('./datos/empleados.json');
+      const proyectos = await leerDatos('./datos/proyectos.json');
+
+      // Buscamos la tarea a editar
+      const tarea = tareas.find(t => t.id === req.params.id);
+      if (!tarea) {
+        return res.status(404).render('error', { mensajeError: 'Tarea no encontrada' });
+      }
+
+      res.render('tareas/editar', {
+        tarea,
+        empleados,
+        proyectos
+      });
+    } catch (error) {
+      console.error('Error mostrando formulario de edición:', error);
+      res.status(500).redirect('/tareas');
+    }
+  },
+
+  // Edita una tarea existente - SK
+  editar: async (req, res) => {
+    // const { id } = req.params;
+    // const { proyectoId, nombre, horasRegistradas, empleadoId } = req.body;
+    try {
+      const tareas = await leerDatos();
+      // Mapear y actualizar la tarea
+      const tareasActualizadas = tareas.map(tarea => {
+        tarea.id === req.params.id ? { ...tarea, ...req.body } : tarea
+      });
+
+      // Guardar cambios
+      await guardarTareas(tareasActualizadas);
+      res.redirect('/tareas');
+    } catch (error) {
+      res.render('tareas/editar', { error: true, tarea: req.body });
+    }
+  },
+
   // Crea una nueva tarea
   crear: async (req, res) => {
     // Extraemos datos del formulario
@@ -122,6 +166,21 @@ module.exports = {
       res.redirect('/tareas');
     } catch {
       // Si falla, nos redirigimos a la lista
+      res.status(500).redirect('/tareas');
+    }
+  },
+
+  // Elimina una tarea - SK
+  eliminar: async (req, res) => {
+    try {
+      const tareas = await leerDatos();
+      // Filtramos las tareas para eliminar la que coincide con el id
+      const tareasActualizadas = tareas.filter(tarea => tarea.id !== req.params.id);
+      
+      // Guardamos los cambios
+      await guardarTareas(tareasActualizadas);
+      res.redirect('/tareas');
+    } catch (error) {
       res.status(500).redirect('/tareas');
     }
   }

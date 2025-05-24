@@ -15,11 +15,20 @@ router.get('/crear', TareaController.mostrarFormulario);
 // Guardar una nueva tarea al enviar el formulario
 router.post('/', TareaController.crear);
 
+// Muestra el formulario para editar una tarea - SK
+router.get('/editar/:id', TareaController.mostrarFormularioEditar);
+
+// Guarda los cambios de la tarea editada - SK
+router.post('/editar/:id', TareaController.editar);
+
+// Elimina una tarea - SK
+router.post('/eliminar/:id', TareaController.eliminar);
+
 // Cambiar el estado de una tarea existente
-router.post('/:id/estado', TareaController.cambiarEstado);
+router.post('/estado/:id', TareaController.cambiarEstado);
 
 // Asignar un empleado a una tarea
-router.post('/:id/asignar', TareaController.asignarEmpleado);
+router.post('/asignar/:id', TareaController.asignarEmpleado);
 
 // Exportamos estas rutas para usarlas en la aplicación principal
 module.exports = router;
