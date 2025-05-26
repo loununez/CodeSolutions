@@ -1,0 +1,32 @@
+//- Formulario para editar un proyecto existente
+extends ../layout  
+block contenido  
+  h1 Editar Proyecto
+
+  form(method="POST" action=`/proyectos/actualizar/${proyecto.id}`).mt-3
+    .form-group.mb-3
+      label(for="nombre") Nombre:
+      input.form-control(
+        type="text" 
+        name="nombre" 
+        value=proyecto.nombre 
+        required
+      )
+    
+    .form-group.mb-3
+      label(for="descripcion") Descripción:
+      textarea.form-control(
+        name="descripcion" 
+        required
+      )= proyecto.descripcion
+    
+    .form-group.mb-3
+      label(for="cliente") Cliente:
+      input.form-control(
+        type="text" 
+        name="cliente" 
+        value=proyecto.cliente 
+        required
+      )
+    
+    button.btn.btn-primary(type="submit") Actualizar Proyecto

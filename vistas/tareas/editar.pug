@@ -1,0 +1,26 @@
+extends ../layout
+
+block contenido
+  h1 Editar Tarea
+
+  if error
+    p.error(style="color: red")= error
+
+  form(method="POST" action=`/tareas/editar/${tarea.id}`)
+    .form-group
+      label(for="proyectoId") ID Proyecto:
+      input(type="text" name="proyectoId" required value=tarea.proyectoId)
+
+    .form-group
+      label(for="nombre") Nombre de la Tarea:
+      input(type="text" name="nombre" required value=tarea.nombre)
+
+    .form-group
+      label(for="horasRegistradas") Horas Registradas:
+      input(type="number" name="horasRegistradas" required min="1" value=tarea.horasRegistradas)
+
+    .form-group
+      label(for="empleadoId") ID Empleado:
+      input(type="text" name="empleadoId" value=tarea.empleadoId)
+
+    button.btn(type="submit") Guardar Cambios

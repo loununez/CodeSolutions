@@ -2,29 +2,20 @@
 extends ../layout  
 
 block contenido 
-  // Título de la página
   h1 Lista de Proyectos
   
-  // Botón para agregar nuevos proyectos
-  
-  a.btn(href="/proyectos/crear") Nuevo Proyecto
-
-  // Verificamos si hay proyectos para mostrar
+  a.btn.btn-primary.mb-3(href="/proyectos/crear") Nuevo Proyecto
 
   if proyectos && proyectos.length > 0
-    // Tabla de proyectos
-    table
-      // Encabezados de la tabla
+    table.table
       thead
         tr
           th Nombre
           th Descripción
           th Cliente
           th Estado
-      
-      // Cuerpo de la tabla
+          th Acciones
       tbody
-        // Mostramos cada proyecto válido como fila
         each proyecto in proyectos
           - if (proyecto.nombre) 
             tr
@@ -32,7 +23,10 @@ block contenido
               td= proyecto.descripcion
               td= proyecto.cliente
               td= proyecto.estado
-  
-      // Mensaje si no hay proyectos
+              td
+                // Botón de Editar
+                a.btn.btn-sm.btn-warning(href=`/proyectos/editar/${proyecto.id}`) Editar
+                // Botón de Eliminar
+                a.btn.btn-sm.btn-danger(href=`/proyectos/eliminar/${proyecto.id}` onclick="return confirm('¿Estás seguro de que querés eliminar este proyecto?')") Eliminar
   else
     p.aviso No hay proyectos registrados.

@@ -49,6 +49,7 @@ module.exports = {
   mostrarFormulario: async (req, res) => {
     try {
       // Necesitamos empleados y proyectos para el formulario
+      const tareas = await leerDatos(archivoTareas);
       const empleados = await leerDatos('./datos/empleados.json');
       const proyectos = await leerDatos('./datos/proyectos.json');
       res.render('tareas/crear', { empleados, proyectos });
@@ -57,6 +58,47 @@ module.exports = {
       res.render('tareas/crear', { error: true });
     }
   },
+
+  // Muestra el formulario para editar una tarea - SK
+  mostrarFormularioEditar: async (req, res) => {
+
+    try {
+      const tareas = await leerDatos(archivoTareas); 
+      const empleados = await leerDatos('./datos/empleados.json');
+      const proyectos = await leerDatos('./datos/proyectos.json');
+
+      // Buscamos la tarea a editar
+      const tarea = tareas.find(t => t.id === req.params.id);
+      if (!tarea) {
+        return res.status(404).render('error', { mensajeError: 'Tarea no encontrada' });
+      }
+
+      res.render('tareas/editar', {
+        tarea,
+        empleados,
+        proyectos
+      });
+    } catch (error) {
+      console.error('Error mostrando formulario de edición:', error);
+      res.status(500).redirect('/tareas');
+    }
+  },
+
+  // Edita una tarea existente - SK
+editar: async (req, res) => {
+  try {
+    const tareas = await leerDatos(archivoTareas); 
+    
+    const tareasActualizadas = tareas.map(tarea => {
+      return tarea.id === req.params.id ? { ...tarea, ...req.body } : tarea;
+    });
+
+    await guardarTareas(tareasActualizadas);
+    res.redirect('/tareas');
+  } catch (error) {
+    res.render('tareas/editar', { error: true, tarea: req.body });
+  }
+},
 
   // Crea una nueva tarea
   crear: async (req, res) => {
@@ -124,5 +166,18 @@ module.exports = {
       // Si falla, nos redirigimos a la lista
       res.status(500).redirect('/tareas');
     }
+  },
+
+  // Elimina una tarea - SK
+eliminar: async (req, res) => {
+  try {
+    const tareas = await leerDatos(archivoTareas); 
+    const tareasActualizadas = tareas.filter(tarea => tarea.id !== req.params.id);
+    
+    await guardarTareas(tareasActualizadas);
+    res.redirect('/tareas');
+  } catch (error) {
+    res.status(500).redirect('/tareas');
   }
+}
 };
