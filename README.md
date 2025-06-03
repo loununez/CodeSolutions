@@ -37,9 +37,9 @@ CodeSolutions/
 
 ## Autores
 
- ** - Nuñes Lourdes
-    - Fernandez Sebastian
-    - Kuperman Sebastian  
-    - Toranzo Emira**
+- Nuñes Lourdes
+- Fernandez Sebastian
+- Kuperman Sebastian  
+- Toranzo Emira
           
 Primer entrega - *Desarrollo Web Backend*
