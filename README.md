@@ -37,7 +37,7 @@ CodeSolutions/
 
 ## Autores
 
-- Nuñes Lourdes
+- Nuñez Lourdes
 - Fernandez Sebastian
 - Kuperman Sebastian  
 - Toranzo Emira
