@@ -1,83 +1,149 @@
-// Importación de módulos necesarios
-const fs = require('fs').promises; // Módulo para manejar archivos
-const Proyecto = require('../modelos/Proyecto'); // Modelo de proyecto
-const archivo = './datos/proyectos.json'; // Ruta del archivo de datos
+const Proyecto = require('../modelos/Proyecto');
+const Tarea = require('../modelos/Tarea');
 
-// Función para obtener todos los proyectos
-const obtenerProyectos = async () => {
+// Mostrar la lista de proyectos
+module.exports.listar = async (req, res) => {
   try {
-    // Lee el archivo y convierte el texto JSON 
-    const datos = await fs.readFile(archivo, 'utf8');
-    return JSON.parse(datos).filter(p => p?.nombre);
-  } catch {
-    // Si hay error, el archivo no existe, crea uno nuevo vacío
-    await fs.writeFile(archivo, '[]');
-    return [];
+    const proyectos = await Proyecto.find().lean();
+
+    for (const proyecto of proyectos) {
+      const tareas = await Tarea.find({ proyectoId: proyecto._id });
+
+      let horasRegistradasTotal = 0;
+      let horasTrabajadasTotal = 0;
+
+      // Sumar las horas de las tareas asociadas al proyecto
+      tareas.forEach(tarea => {
+        horasRegistradasTotal += tarea.horas || 0;
+        horasTrabajadasTotal += tarea.horasTrabajadas || 0;
+      });
+
+      // Agregar las horas al objeto del proyecto (no guardamos en DB)
+      proyecto.horasRegistradas = horasRegistradasTotal;
+      proyecto.horasTrabajadas = horasTrabajadasTotal;
+    }
+
+    // Renderizar la vista con los proyectos y sus horas calculadas
+    res.render('proyectos/listar', { proyectos });
+  } catch (error) {
+    console.error('Error al obtener proyectos:', error);
+    res.status(500).render('error', {
+      titulo: 'Error',
+      mensajeError: 'Error al cargar los proyectos'
+    });
   }
 };
 
-// Función para guardar los proyectos en el archivo
-const guardarProyectos = async (proyectos) => {
-  await fs.writeFile(archivo, JSON.stringify(proyectos));
+// Mostrar el formulario para crear un nuevo proyecto
+module.exports.mostrarFormulario = async (req, res) => {
+  try {
+    res.render('proyectos/crear');
+  } catch (error) {
+    console.error('Error al cargar formulario de creación de proyecto:', error);
+    res.status(500).render('error', {
+      titulo: 'Error',
+      mensajeError: 'Error al cargar el formulario de creación de proyecto'
+    });
+  }
 };
 
-// Controlador con las operaciones CRUD para proyectos
-module.exports = {
-  // Obtiene y muestra la lista de proyectos
-  listar: async (req, res) => {
-    try {
-      const proyectos = await obtenerProyectos();
-      res.render('proyectos/listar', { proyectos });
-    } catch {
-      res.render('proyectos/listar', { proyectos: [] });
+// Crear un nuevo proyecto
+module.exports.crear = async (req, res) => {
+  try {
+    const { nombre, descripcion, fechaInicio, fechaFin, progreso, estado } = req.body;
+
+    if (!fechaInicio || !fechaFin) {
+      throw new Error('Las fechas son requeridas');
     }
-  },
 
-  // Muestra el formulario de creación
-  mostrarFormularioCrear: (req, res) => res.render('proyectos/crear'),
+    const nuevoProyecto = new Proyecto({
+      nombre,
+      descripcion,
+      fechaInicio: new Date(fechaInicio),
+      fechaFin: new Date(fechaFin),
+      progreso: progreso || 0,
+      estado
+      // No se incluyen horasRegistradas ni horasTrabajadas
+    });
 
-  // Muestra el formulario de edición con los datos del proyecto
-  mostrarFormularioEditar: async (req, res) => {
-    const proyectos = await obtenerProyectos();
-    const proyecto = proyectos.find(p => p.id === req.params.id);
+    await nuevoProyecto.save();
+    res.redirect('/proyectos');
+  } catch (error) {
+    console.error('Error al crear proyecto:', error);
+    res.render('proyectos/crear', {
+      error: true,
+      datos: req.body
+    });
+  }
+};
+
+// Mostrar el formulario para editar un proyecto
+module.exports.mostrarFormularioEditar = async (req, res) => {
+  try {
+    const proyecto = await Proyecto.findById(req.params.id);
+
+    if (!proyecto) {
+      return res.status(404).render('error', {
+        mensajeError: 'Proyecto no encontrado'
+      });
+    }
+
     res.render('proyectos/editar', { proyecto });
-  },
+  } catch (error) {
+    console.error('Error al mostrar formulario de edición de proyecto:', error);
+    res.status(500).redirect('/proyectos');
+  }
+};
 
-  // Crea un nuevo proyecto
-  crear: async (req, res) => {
-    try {
-      const proyectos = await obtenerProyectos();
-      proyectos.push(new Proyecto(req.body.nombre, req.body.descripcion, req.body.cliente));
-      await guardarProyectos(proyectos);
-      res.redirect('/proyectos');
-    } catch {
-      res.render('proyectos/crear', { error: true, datos: req.body });
-    }
-  },
+// Editar un proyecto existente
+module.exports.editar = async (req, res) => {
+  try {
+    const { nombre, descripcion, fechaInicio, fechaFin, progreso, estado } = req.body;
 
-  // Actualiza un proyecto existente
-  actualizar: async (req, res) => {
-    try {
-      const proyectos = await obtenerProyectos();
-      const actualizados = proyectos.map(p => 
-        p.id === req.params.id ? { ...p, ...req.body } : p
-      );
-      await guardarProyectos(actualizados);
-      res.redirect('/proyectos');
-    } catch {
-      res.render('proyectos/editar', { error: true, proyecto: req.body });
-    }
-  },
+    const proyectoActualizado = await Proyecto.findByIdAndUpdate(
+      req.params.id,
+      {
+        nombre,
+        descripcion,
+        fechaInicio: new Date(fechaInicio),
+        fechaFin: new Date(fechaFin),
+        progreso,
+        estado
+        // No actualizamos horasRegistradas ni horasTrabajadas
+      },
+      { new: true }
+    );
 
-  // Elimina un proyecto
-  eliminar: async (req, res) => {
-    try {
-      const proyectos = await obtenerProyectos();
-      const filtrados = proyectos.filter(p => p.id !== req.params.id);
-      await guardarProyectos(filtrados);
-      res.redirect('/proyectos');
-    } catch {
-      res.status(500).redirect('/proyectos');
+    if (!proyectoActualizado) {
+      return res.status(404).render('error', {
+        mensajeError: 'Proyecto no encontrado para editar'
+      });
     }
+
+    res.redirect('/proyectos');
+  } catch (error) {
+    console.error('Error al editar proyecto:', error);
+    res.render('proyectos/editar', {
+      error: true,
+      proyecto: req.body
+    });
+  }
+};
+
+// Eliminar un proyecto
+module.exports.eliminar = async (req, res) => {
+  try {
+    const proyectoEliminado = await Proyecto.findByIdAndDelete(req.params.id);
+
+    if (!proyectoEliminado) {
+      return res.status(404).render('error', {
+        mensajeError: 'Proyecto no encontrado para eliminar'
+      });
+    }
+
+    res.redirect('/proyectos');
+  } catch (error) {
+    console.error('Error al eliminar proyecto:', error);
+    res.status(500).redirect('/proyectos');
   }
 };

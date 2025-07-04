@@ -1,14 +1,15 @@
-const { v4: uuidv4 } = require('uuid');
+const mongoose = require('mongoose');
 
-class Proyecto {
-    constructor(nombre, descripcion, cliente) {
-        this.id = uuidv4();
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.cliente = cliente;
-        this.estado = 'activo';
-        this.fechaCreacion = new Date().toISOString();
-    }
-}
+const ProyectoSchema = new mongoose.Schema({
+  nombre: { type: String, required: true },
+  descripcion: { type: String, required: true },
+  fechaInicio: { type: Date, required: true },
+  fechaFin: { type: Date, required: true },
+  progreso: { type: Number, required: true, default: 0 },
+  estado: { type: String, required: true },
+  horasRegistradas: { type: Number, required: true, default: 0 },  // Nuevo campo para horas registradas
+  horasTrabajadas: { type: Number, required: true, default: 0 },   // Nuevo campo para horas trabajadas
+});
 
-module.exports = Proyecto;
+module.exports = mongoose.model('Proyecto', ProyectoSchema);
+

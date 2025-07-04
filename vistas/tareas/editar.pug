@@ -1,26 +1,151 @@
 extends ../layout
 
 block contenido
-  h1 Editar Tarea
+  style.
+    .modal-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 2rem;
+    }
 
-  if error
-    p.error(style="color: red")= error
+    .modal {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
 
-  form(method="POST" action=`/tareas/editar/${tarea.id}`)
-    .form-group
-      label(for="proyectoId") ID Proyecto:
-      input(type="text" name="proyectoId" required value=tarea.proyectoId)
+    .modal h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
 
-    .form-group
-      label(for="nombre") Nombre de la Tarea:
-      input(type="text" name="nombre" required value=tarea.nombre)
+    .modal p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
 
-    .form-group
-      label(for="horasRegistradas") Horas Registradas:
-      input(type="number" name="horasRegistradas" required min="1" value=tarea.horasRegistradas)
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.2rem;
+    }
 
-    .form-group
-      label(for="empleadoId") ID Empleado:
-      input(type="text" name="empleadoId" value=tarea.empleadoId)
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
 
-    button.btn(type="submit") Guardar Cambios
+    label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #0f172a;
+      background-color: #fff;
+    }
+
+    .acciones {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-cancelar {
+      background-color: #f3f4f6;
+      color: #374151;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      border: none;
+    }
+
+    .btn-enviar {
+      background-color: #0f172a;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-enviar:hover {
+      background-color: #1e293b;
+    }
+
+  .modal-wrapper
+    .modal
+      h2 Editar Tarea
+      p Actualiza los detalles de la tarea
+
+      if error
+        .error(style="color:red")= error
+
+      form(method="POST" action=`/tareas/editar/${tarea._id}`)
+        .form-group
+          label(for="nombre") Nombre de la tarea *
+          input(type="text", name="nombre", value=tarea.nombre placeholder="Ej: Implementar nueva funcionalidad" required)
+
+        .form-group
+          label(for="descripcion") Descripción *
+          textarea(name="descripcion", placeholder="Describe la tarea en detalle..." required)= tarea.descripcion
+
+        .form-row
+          .form-group
+            label(for="horasRegistradas") Horas registradas *
+            input(type="number", name="horasRegistradas", value=tarea.horasRegistradas placeholder="Ej: 5" required)
+
+          .form-group
+            label(for="horasTrabajadas") Horas trabajadas *
+            input(type="number", name="horasTrabajadas", placeholder="Ej: 5 (tiempo real)" required)
+
+        .form-row
+          .form-group
+            label(for="empleadoId") Asignado a *
+            select(name="empleadoId" required)
+              each empleado in empleados
+                option(value=empleado._id, selected=empleado._id == tarea.empleadoId._id) #{empleado.nombre}
+
+          .form-group
+            label(for="proyectoId") Proyecto *
+            select(name="proyectoId" required)
+              each proyecto in proyectos
+                option(value=proyecto._id, selected=proyecto._id == tarea.proyectoId._id) #{proyecto.nombre}
+
+        .form-row
+          .form-group
+            label(for="prioridad") Prioridad *
+            select(name="prioridad" required)
+              option(value="Alta", selected=tarea.prioridad == 'Alta') Alta
+              option(value="Media", selected=tarea.prioridad == 'Media') Media
+              option(value="Baja", selected=tarea.prioridad == 'Baja') Baja
+
+          .form-group
+            label(for="fecha_vencimiento") Fecha de vencimiento *
+            input(type="date", name="fecha_vencimiento", value=tarea.fecha_vencimiento ? tarea.fecha_vencimiento.toISOString().split('T')[0] : "" required)
+
+        .acciones
+          a.btn-cancelar(href="/tareas") Cancelar
+          button.btn-enviar(type="submit") Actualizar Tarea

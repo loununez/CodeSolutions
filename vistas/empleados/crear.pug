@@ -1,37 +1,129 @@
-//- Plantilla para registrar nuevos empleados formulario HTML
+//- vistas/empleados/crear.pug
 extends ../layout  
 
 block contenido  
+  style.
+    .modal-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 2rem;
+    }
 
-  // Título principal
-  h1 Registrar Nuevo Empleado
-  
-  // Mostrar mensaje de error si es que existe
-  if error
-    .error(style="color:red")= error  
+    .modal {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
 
-  // Formulario que envía datos a /empleados por POST
-  form(method="POST" action="/empleados")
-    
-    // Campo para el nombre
-    .form-group
-      label(for="nombre") Nombre:
-      input(type="text" name="nombre" required) 
-    
-    // Campo para el email
-    .form-group
-      label(for="email") Email:
-      input(type="email" name="email" required)  
-    
-    // Campo para el perfil técnico
-    .form-group
-      label(for="perfilTecnico") Perfil Técnico:
-      input(type="text" name="perfilTecnico" required)
-    
-    // Campo para la especialidad
-    .form-group
-      label(for="especialidad") Especialidad:
-      input(type="text" name="especialidad" required)
-    
-    // Botón para enviar el formulario
-    button.btn(type="submit") Guardar Empleado
+    .modal h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .modal p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #0f172a;
+      background-color: #fff;
+    }
+
+    .acciones {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-cancelar {
+      background-color: #f3f4f6;
+      color: #374151;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      border: none;
+    }
+
+    .btn-enviar {
+      background-color: #0f172a;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-enviar:hover {
+      background-color: #1e293b;
+    }
+
+  .modal-wrapper
+    .modal
+      h2 Nuevo Empleado
+      p Agrega un nuevo miembro al equipo
+
+      if error
+        .error(style="color:red")= error  
+
+      form(method="POST" action="/empleados")
+        .form-group
+          label(for="nombre") Nombre completo *
+          input(type="text" name="nombre" placeholder="Ej: Juan Pérez" required) 
+
+        .form-group
+          label(for="perfilTecnico") Puesto *
+          input(type="text" name="perfilTecnico" placeholder="Ej: Desarrollador Frontend" required)
+
+        .form-group
+          label(for="especialidad") Especialidad *
+          input(type="text" name="especialidad" placeholder="Ej: JavaScript, Python, DevOps" required)
+
+        .form-group
+          label(for="email") Email corporativo *
+          input(type="email" name="email" placeholder="juan.perez@codesolutions.com" required)  
+
+        .form-group
+          label(for="telefono") Teléfono
+          input(type="text" name="telefono" placeholder="+34 666 123 456")
+
+        .form-group
+          label(for="estado") Estado
+          select(name="estado")
+            option(value="Activo") Activo
+            option(value="Inactivo") Inactivo
+
+        .acciones
+          a.btn-cancelar(href="/empleados") Cancelar
+          button.btn-enviar(type="submit") Agregar Empleado

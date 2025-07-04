@@ -1,30 +1,192 @@
 extends ../layout
 
 block contenido
-  h1 Lista de Tareas
+  style.
+    /* Estilos generales de la página */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
 
-  a.btn(href="/tareas/crear") Nueva Tarea
+    .header h1 {
+      font-size: 2rem;
+      font-weight: bold;
+    }
 
-  if tareas && tareas.length > 0
-    table
-      thead
-        tr
-          th Tarea
-          th Horas
-          th Proyecto
-          th Estado
-          th Acciones
-      tbody
-        each tarea in tareas
-          - if (tarea.nombre)
-            tr
-              td= tarea.nombre
-              td= tarea.horasRegistradas
-              td= tarea.proyectoId
-              td= tarea.estado
-              td
-                a.btn(href=`/tareas/editar/${tarea.id}`) Editar
-                form(method="POST" action=`/tareas/eliminar/${tarea.id}` style="display:inline;")
-                  button.btn(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta tarea?')") Eliminar
-  else
-    p No hay tareas registradas
+    .header p {
+      color: #6b7280;
+    }
+
+    .btn-nueva {
+      background-color: #0f172a;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .tareas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Asegura una distribución óptima */
+      gap: 1.5rem;
+    }
+
+    .tarea-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .tarea-card h2 {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .tarea-card p.descripcion {
+      color: #6b7280;
+      margin-bottom: 0.75rem;
+    }
+
+    .tarea-card .estado {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      margin-left: 0.5rem;
+      text-transform: capitalize;
+    }
+
+    .estado.Pendiente {
+      background-color: #f3f4f6; /* Gris claro */
+    }
+
+    .estado.En\\ Progreso {
+      background-color: #dbeafe;
+      color: #1d4ed8; /* Azul */
+    }
+
+    .estado.Completada {
+      background-color: #d1fae5;
+      color: #047857; /* Verde */
+    }
+
+    .tarea-card .info {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .tarea-card .info svg {
+      margin-right: 0.4rem;
+      width: 1rem;
+    }
+
+    .proyecto {
+      font-weight: 600;
+    }
+
+    .prioridad.Alta {
+      color: red;
+    }
+
+    .prioridad.Media {
+      color: #d97706;
+    }
+
+    .prioridad.Baja {
+      color: #065f46;
+    }
+
+    .acciones {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    /* Estilos para los botones "Editar" y "Eliminar" */
+    .btn-editar, .btn-eliminar {
+      background-color:rgb(0, 0, 0); /* Fondo negro para los botones */
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+    }
+
+    .btn-editar:hover, .btn-eliminar:hover {
+      background-color:rgb(0, 0, 0); /* Color ligeramente más claro en hover */
+    }
+
+    .btn-editar {
+      background-color:rgb(0, 0, 0); /* Verde */
+    }
+
+    .btn-editar:hover {
+      background-color:rgb(0, 0, 0);
+    }
+
+    .btn-eliminar {
+      background-color:rgb(0, 0, 0); /* Rojo */
+    }
+
+    .btn-eliminar:hover {
+      background-color:rgb(0, 0, 0);
+    }
+
+  .header
+    .left
+      h1 Tareas
+      p Gestión de tareas y asignaciones del equipo
+    .right
+      a.btn-nueva(href="/tareas/crear") + Nueva Tarea
+
+  .tareas-grid
+    each tarea in tareas
+      .tarea-card
+        h2 
+          = tarea.nombre
+          span.estado(class=tarea.estado)= tarea.estado
+
+        p.descripcion= tarea.descripcion
+
+        .info
+          span 🧑‍💻&nbsp;
+          |  #{(tarea.empleadoId && tarea.empleadoId.nombre) || 'Sin asignar'}
+
+        .info
+          span 📁&nbsp;
+          |  Proyecto:
+          span.proyecto &nbsp; #{(tarea.proyectoId && tarea.proyectoId.nombre) || 'Sin proyecto'}
+
+        .info
+          span ⚡&nbsp;
+          |  Prioridad:
+          span.prioridad(class=tarea.prioridad) &nbsp; #{tarea.prioridad}
+
+        .info
+          span 📅&nbsp;
+          |  #{tarea.fecha_vencimiento ? tarea.fecha_vencimiento.toLocaleDateString('es-ES') : 'Sin fecha'}
+
+        .info
+          span ⏳&nbsp;
+          |  Horas registradas:
+          span= tarea.horasRegistradas
+
+        .info
+          span 🕒&nbsp;
+          |  Horas trabajadas:
+          span= tarea.horasTrabajadas
+
+        .acciones
+          a.btn-editar(href=`/tareas/editar/${tarea._id}`) Editar
+          form(method="POST" action=`/tareas/eliminar/${tarea._id}` style="display:inline;")
+            button.btn-eliminar(type="submit") Eliminar

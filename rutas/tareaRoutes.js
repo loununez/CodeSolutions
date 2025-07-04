@@ -1,34 +1,17 @@
-// Configuración de rutas para manejar tareas
 const express = require('express');
 const router = express.Router();
 
-// Importamos las funciones que manejan las tareas
-const TareaController = require('../controller/TareaController');
+// Importa el controlador de tareas desde la carpeta 'controller'
+const tareaController = require('../controller/TareaController');  // Asegúrate de que el path sea correcto
 
-// Definimos las rutas disponibles
-// Ver lista de todas las tareas
-router.get('/', TareaController.listar);
+// Rutas para las tareas
+router.get('/', tareaController.listar); // Mostrar lista de tareas
+router.get('/crear', tareaController.mostrarFormulario); // Mostrar formulario de creación
+router.post('/', tareaController.crear); // Crear una nueva tarea
+router.get('/editar/:id', tareaController.mostrarFormularioEditar); // Mostrar formulario de edición
+router.post('/editar/:id', tareaController.editar); // Editar una tarea
+router.post('/eliminar/:id', tareaController.eliminar); // Eliminar tarea
 
-// Mostrar formulario para crear nueva tarea
-router.get('/crear', TareaController.mostrarFormulario);
-
-// Guardar una nueva tarea al enviar el formulario
-router.post('/', TareaController.crear);
-
-// Muestra el formulario para editar una tarea - SK
-router.get('/editar/:id', TareaController.mostrarFormularioEditar);
-
-// Guarda los cambios de la tarea editada - SK
-router.post('/editar/:id', TareaController.editar);
-
-// Elimina una tarea - SK
-router.post('/eliminar/:id', TareaController.eliminar);
-
-// Cambiar el estado de una tarea existente
-router.post('/estado/:id', TareaController.cambiarEstado);
-
-// Asignar un empleado a una tarea
-router.post('/asignar/:id', TareaController.asignarEmpleado);
-
-// Exportamos estas rutas para usarlas en la aplicación principal
 module.exports = router;
+
+

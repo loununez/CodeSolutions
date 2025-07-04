@@ -1,32 +1,160 @@
-//- Vista que muestra todos los proyectos del sistema
-extends ../layout  
+extends ../layout
 
-block contenido 
-  h1 Lista de Proyectos
-  
-  a.btn.btn-primary.mb-3(href="/proyectos/crear") Nuevo Proyecto
+block contenido
+  style.
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
 
-  if proyectos && proyectos.length > 0
-    table.table
-      thead
-        tr
-          th Nombre
-          th Descripción
-          th Cliente
-          th Estado
-          th Acciones
-      tbody
-        each proyecto in proyectos
-          - if (proyecto.nombre) 
-            tr
-              td= proyecto.nombre
-              td= proyecto.descripcion
-              td= proyecto.cliente
-              td= proyecto.estado
-              td
-                // Botón de Editar
-                a.btn.btn-sm.btn-warning(href=`/proyectos/editar/${proyecto.id}`) Editar
-                // Botón de Eliminar
-                a.btn.btn-sm.btn-danger(href=`/proyectos/eliminar/${proyecto.id}` onclick="return confirm('¿Estás seguro de que querés eliminar este proyecto?')") Eliminar
-  else
-    p.aviso No hay proyectos registrados.
+    .header h1 {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .header p {
+      color: #6b7280;
+    }
+
+    .btn-nuevo {
+      background-color: #0f172a;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .proyectos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .proyecto-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .proyecto-card h2 {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .proyecto-card p {
+      color: #6b7280;
+      margin-bottom: 0.75rem;
+    }
+
+    .estado {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      background-color: #f3f4f6;
+      margin-left: 0.5rem;
+    }
+
+    .estado.En\\ Progreso {
+      background-color: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .estado.Completado {
+      background-color: #d1fae5;
+      color: #047857;
+    }
+
+    .proyecto-card .info {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .proyecto-card .info svg {
+      margin-right: 0.4rem;
+      width: 1rem;
+    }
+
+    .progreso-bar {
+      width: 100%;
+      height: 8px;
+      background-color: #e5e7eb; /* Color gris de fondo de la barra */
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+
+    .progreso {
+      height: 100%;
+      border-radius: 4px;
+      background-color: #1d4ed8; 
+    }
+
+    .proyecto-card .acciones {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+
+    .acciones a, .acciones button {
+      background-color: #2d3436;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none; /* Elimina subrayado en el enlace */
+    }
+
+    /* Eliminar subrayado en el enlace de "Editar" */
+    .acciones a {
+      text-decoration: none; /* Asegura que no haya subrayado */
+    }
+
+  .header
+    .left
+      h1 Proyectos
+      p Gestión de proyectos de desarrollo
+    .right
+      a.btn-nuevo(href="/proyectos/crear") Nuevo Proyecto
+
+  .proyectos-grid
+    each proyecto in proyectos
+      .proyecto-card
+        h2= proyecto.nombre
+        span.estado(class=proyecto.estado.replace(' ', '\\ '))= proyecto.estado
+
+        p= proyecto.descripcion
+
+        .info
+          span 📅&nbsp;
+          |  Fechas:
+          span= proyecto.fechaInicio ? proyecto.fechaInicio.toLocaleDateString('es-ES') : 'Fecha no definida' 
+          |  - 
+          span= proyecto.fechaFin ? proyecto.fechaFin.toLocaleDateString('es-ES') : 'Fecha no definida'
+
+        .info
+          span 📊&nbsp;
+          |  Progreso:
+          .progreso-bar
+            .progreso(style=`width: ${proyecto.progreso}%`)
+
+        .info
+          span ⏱️&nbsp;
+          |  Horas Registradas: #{proyecto.horasRegistradas}
+
+        .info
+          span ⚙️&nbsp;
+          |  Horas Trabajadas: #{proyecto.horasTrabajadas}
+
+        .acciones
+          a(href=`/proyectos/editar/${proyecto._id}`) Editar
+          form(method="POST" action=`/proyectos/eliminar/${proyecto._id}` style="display:inline;")
+            button(type="submit") Eliminar

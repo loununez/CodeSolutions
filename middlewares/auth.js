@@ -1,11 +1,24 @@
-// Middleware para verificar si el usuario está logueado
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'secreto123';
+
 module.exports = (req, res, next) => {
-  // Si no hay usuario en la sesión
-  if (!req.user) {
-    // Se redirige a la página de login con código de error 401 
-    return res.status(401).redirect('/auth/login');
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.redirect('/auth/login');
   }
-  
-  // Si el usuario existe, se puede continuar
-  next();
+
+  try {
+    const usuario = jwt.verify(token, JWT_SECRET);
+
+    // Lo guardamos para usar en controladores y vistas
+    req.user = usuario;
+    res.locals.user = usuario;
+
+    next();
+  } catch (error) {
+    console.error('Token inválido:', error.message);
+    res.clearCookie('token');
+    return res.redirect('/auth/login');
+  }
 };

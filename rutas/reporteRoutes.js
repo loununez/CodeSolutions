@@ -1,13 +1,8 @@
-// Importamos Express 
 const express = require('express');
 const router = express.Router();
+const reporteController = require('../controller/ReporteController'); // Cambié la ruta para que coincida con la carpeta 'controller'
 
-// Importamos el controlador que genera los reportes
-const ReporteController = require('../controller/ReporteController');
+// Ruta para los reportes
+router.get('/', reporteController.reportes);  // Asegúrate de que la ruta sea correcta
 
-// Definimos la única ruta de reportes
-// Cuando visiten la página principal de reportes
-router.get('/', ReporteController.reportes);
-
-// Exportamos la configuración de esta ruta
 module.exports = router;

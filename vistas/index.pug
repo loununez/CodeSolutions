@@ -1,19 +1,197 @@
-//-Página principal inicio del sistema
-extends layout  
+extends layout
 
-block contenido  
+block contenido
+  header.header
+    h1 Dashboard
+    p Bienvenido al sistema de gestión de Code Solutions
 
-  // Bienvenida
-  h1 Bienvenido a Code Solutions
-  p Sistema de gestión de proyectos
+  .cards
+    .card
+      h3 Empleados Activos
+      span.icon 🧑‍💼
+      h2 25
+      p +2 este mes
+    .card
+      h3 Tareas Pendientes
+      span.icon 📝
+      h2 47
+      p 8 vencen hoy
+    .card
+      h3 Proyectos Activos
+      span.icon 📁
+      h2 12
+      p 3 en progreso
+    .card
+      h3 Ingresos Este Mes
+      span.icon 📈
+      h2 $125,400
+      p +15% vs mes anterior
 
-  // Menú principal 
-  .menu
-    // Botón para ir a empleados
-    a.btn(href="/empleados") Gestionar Empleados
-    
-    // Botón para ir a proyectos
-    a.btn(href="/proyectos") Gestionar Proyectos
-    
-    // Botón para ir a tareas
-    a.btn(href="/tareas") Gestionar Tareas
+  .grid
+    .card-full
+      h3 Actividad Reciente
+      p.sub Últimas acciones en el sistema
+      ul.activity
+        li
+          span.dot(style="background: #22c55e") 
+          strong Ana García 
+          | completó la tarea "Revisión de código"
+        li
+          span.dot(style="background: #3b82f6") 
+          strong Carlos López 
+          | se unió al proyecto "App Mobile"
+        li
+          span.dot(style="background: #facc15") 
+          strong María Rodríguez 
+          | creó una nueva tarea
+    .card-full
+      h3 Proyectos en Progreso
+      p.sub Estado actual de los proyectos activos
+
+      .project
+        .title Sistema CRM
+        .progress
+          .bar(style="width: 75%")
+        .percent 75%
+
+      .project
+        .title App E-commerce
+        .progress
+          .bar(style="width: 45%")
+        .percent 45%
+
+      .project
+        .title Portal Web
+        .progress
+          .bar(style="width: 90%")
+        .percent 90%
+
+  style.
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .header p {
+      color: #6b7280;
+      font-size: 16px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .card h3 {
+      color: #374151;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .card .icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 18px;
+    }
+
+    .card h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .card p {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .card-full {
+      background: white;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+    }
+
+    .card-full h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 5px;
+    }
+
+    .card-full .sub {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    .activity li {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .activity .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .activity strong {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .project {
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .project .title {
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 5px;
+    }
+
+    .progress {
+      background: #f3f4f6;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar {
+      background: #111827;
+      height: 8px;
+    }
+
+    .percent {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 13px;
+      color: #4b5563;
+    }

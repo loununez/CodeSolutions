@@ -1,32 +1,136 @@
-//- Formulario para editar un proyecto existente
-extends ../layout  
-block contenido  
-  h1 Editar Proyecto
+extends ../layout
 
-  form(method="POST" action=`/proyectos/actualizar/${proyecto.id}`).mt-3
-    .form-group.mb-3
-      label(for="nombre") Nombre:
-      input.form-control(
-        type="text" 
-        name="nombre" 
-        value=proyecto.nombre 
-        required
-      )
-    
-    .form-group.mb-3
-      label(for="descripcion") Descripción:
-      textarea.form-control(
-        name="descripcion" 
-        required
-      )= proyecto.descripcion
-    
-    .form-group.mb-3
-      label(for="cliente") Cliente:
-      input.form-control(
-        type="text" 
-        name="cliente" 
-        value=proyecto.cliente 
-        required
-      )
-    
-    button.btn.btn-primary(type="submit") Actualizar Proyecto
+block contenido
+  style.
+    .modal-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 2rem;
+    }
+
+    .modal {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    .modal h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .modal p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #0f172a;
+      background-color: #fff;
+    }
+
+    .acciones {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-cancelar {
+      background-color: #f3f4f6;
+      color: #374151;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      border: none;
+    }
+
+    .btn-enviar {
+      background-color: #0f172a;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-enviar:hover {
+      background-color: #1e293b;
+    }
+
+  .modal-wrapper
+    .modal
+      h2 Editar Proyecto
+      p Actualiza la información del proyecto
+
+      if error
+        .error(style="color:red")= error  
+
+      form(method="POST" action=`/proyectos/editar/${proyecto._id}`)
+        .form-group
+          label(for="nombre") Nombre del proyecto *
+          input(type="text" name="nombre" value=proyecto.nombre placeholder="Ej: Sistema CRM" required)
+
+        .form-group
+          label(for="descripcion") Descripción
+          textarea(name="descripcion" placeholder="Descripción del proyecto" required)= proyecto.descripcion
+
+        .form-group
+          label(for="estado") Estado
+          select(name="estado")
+            option(value="En Progreso", selected=proyecto.estado == "En Progreso") En Progreso
+            option(value="Completado", selected=proyecto.estado == "Completado") Completado
+
+        .form-group
+          label(for="progreso") Progreso (%)
+          input(type="number" name="progreso" value=proyecto.progreso min="0" max="100" required)
+
+        .form-group
+          label(for="fechaInicio") Fecha de inicio *
+          input(type="date" name="fechaInicio" value=proyecto.fechaInicio ? proyecto.fechaInicio.toISOString().split('T')[0] : "" required)
+
+        .form-group
+          label(for="fechaFin") Fecha de fin *
+          input(type="date" name="fechaFin" value=proyecto.fechaFin ? proyecto.fechaFin.toISOString().split('T')[0] : "" required)
+
+        .form-group
+          label(for="horasRegistradas") Horas Registradas *
+          input(type="number" name="horasRegistradas" min="0" value=proyecto.horasRegistradas required)
+
+        .form-group
+          label(for="horasTrabajadas") Horas Trabajadas *
+          input(type="number" name="horasTrabajadas" min="0" value=proyecto.horasTrabajadas required)
+
+        .acciones
+          a.btn-cancelar(href="/proyectos") Cancelar
+          button.btn-enviar(type="submit") Actualizar Proyecto

@@ -1,29 +1,23 @@
-// Importamos Express
 const express = require('express');
 const router = express.Router();
+const ProyectoController = require('../controller/ProyectoController');  // Asegúrate de que el path sea correcto
 
-// Traemos todas las funciones para manejar proyectos
-const ProyectoController = require('../controller/ProyectoController');
+// Ruta para mostrar la lista de proyectos
+router.get('/', ProyectoController.listar);  // Asegúrate de que 'listar' sea una función en el controlador
 
-// Configuramos las páginas y acciones
+// Ruta para mostrar el formulario de creación de proyecto
+router.get('/crear', ProyectoController.mostrarFormulario);
 
-// Página principal donde muestra todos los proyectos
-router.get('/', ProyectoController.listar);
-
-// Formulario para agregar un proyecto nuevo
-router.get('/crear', ProyectoController.mostrarFormularioCrear);
-
-// Guarda el proyecto nuevo cuando se envía el formulario
+// Ruta para crear un proyecto
 router.post('/', ProyectoController.crear);
 
-// Muestra el formulario para modificar un proyecto
+// Ruta para editar un proyecto
 router.get('/editar/:id', ProyectoController.mostrarFormularioEditar);
 
-// Actualiza los cambios del proyecto
-router.post('/actualizar/:id', ProyectoController.actualizar);
+// Ruta para guardar los cambios de un proyecto editado
+router.post('/editar/:id', ProyectoController.editar);
 
-// Elimina un proyecto existente
-router.get('/eliminar/:id', ProyectoController.eliminar);
+// Ruta para eliminar un proyecto
+router.post('/eliminar/:id', ProyectoController.eliminar);
 
-// Exportamos estas rutas para usarlas en index.js
 module.exports = router;

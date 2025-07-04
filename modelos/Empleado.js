@@ -1,24 +1,16 @@
-// Importamos la herramienta para generar IDs únicos
-const { v4: uuidv4 } = require('uuid');
+const mongoose = require('mongoose');
 
-// Definimos la plantilla para crear empleados
-class Empleado {
-  constructor(nombre, email, perfilTecnico, especialidad, habilidades = []) {
-    // Información del empleado
-    this.id = uuidv4();          
-    this.nombre = nombre;        
-    this.email = email;          
-    this.perfilTecnico = perfilTecnico; 
-    this.especialidad = especialidad;  
-    
-    // Habilidades
-    this.habilidades = habilidades;
-    
-    //Configuración automática al crear un estado (activo por defecto) y fecha de registro
-    this.estaActivo = true;      
-    this.fechaCreacion = new Date().toISOString();
-  }
-}
+const empleadoSchema = new mongoose.Schema({
+  nombre: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  perfilTecnico: { type: String, required: true },
+  especialidad: { type: String, required: true },
+  habilidades: { type: [String], default: [] },
+  telefono: { type: String, default: '' },
+  estaActivo: { type: Boolean, default: true },
+  fechaCreacion: { type: Date, default: Date.now }
+});
 
-// Permitimos que otros archivos puedan crear empleados usando esta funcion
+// Acá creamos y exportamos el modelo
+const Empleado = mongoose.model('Empleado', empleadoSchema);
 module.exports = Empleado;

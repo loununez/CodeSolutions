@@ -1,42 +1,17 @@
-const fs = require('fs').promises; 
-const Tarea = require('../modelos/Tarea'); 
-const archivoTareas = './datos/tareas.json'; 
+const Tarea = require('../modelos/Tarea');
+const Empleado = require('../modelos/Empleado');
+const Proyecto = require('../modelos/Proyecto');
 
-// Función para leer datos de cualquier archivo JSON
-async function leerDatos(archivo) {
-  try {
-    const datos = await fs.readFile(archivo, 'utf8');
-    return JSON.parse(datos);
-  } catch {
-    // Si falla porque el archivo no existe, creamos uno nuevo vacío
-    await fs.writeFile(archivo, '[]');
-    return []; // Devolvemos array vacío
-  }
-}
-
-// Función guardar tareas
-async function guardarTareas(tareas) {
-  await fs.writeFile(archivoTareas, JSON.stringify(tareas));
-}
-
-// Exportamos las funciones que manejarán las tareas
 module.exports = {
   // Muestra la lista de tareas con información relacionada
   listar: async (req, res) => {
     try {
-      // Obtenemos tareas, empleados y proyectos
-      const tareas = await leerDatos(archivoTareas);
-      const empleados = await leerDatos('./datos/empleados.json');
-      const proyectos = await leerDatos('./datos/proyectos.json');
-      
-      // Mostramos la vista con todos los datos
-      res.render('tareas/listar', { 
-        tareas: tareas,
-        empleados: empleados,
-        proyectos: proyectos
-      });
+      const tareas = await Tarea.find()
+        .populate('empleadoId')
+        .populate('proyectoId');
+
+      res.render('tareas/listar', { tareas });
     } catch (error) {
-      // Si hay error, mostramos página de "error"
       console.error('Error:', error);
       res.status(500).render('error', {
         titulo: 'Error',
@@ -45,33 +20,109 @@ module.exports = {
     }
   },
 
-  // Muestra el formulario para crear nueva tarea
+  // Muestra el formulario para crear una nueva tarea
   mostrarFormulario: async (req, res) => {
     try {
-      // Necesitamos empleados y proyectos para el formulario
-      const tareas = await leerDatos(archivoTareas);
-      const empleados = await leerDatos('./datos/empleados.json');
-      const proyectos = await leerDatos('./datos/proyectos.json');
-      res.render('tareas/crear', { empleados, proyectos });
-    } catch {
-      // Si falla, mostramos formulario con que tuvo un error
-      res.render('tareas/crear', { error: true });
+      const empleados = await Empleado.find();
+      const proyectos = await Proyecto.find();
+
+      res.render('tareas/crear', {
+        empleados,
+        proyectos
+      });
+    } catch (error) {
+      console.error('Error al mostrar el formulario:', error);
+      
+      // Asegurarse de pasar empleados y proyectos incluso en caso de error
+      const empleados = await Empleado.find().catch(() => []);
+      const proyectos = await Proyecto.find().catch(() => []);
+      
+      res.render('tareas/crear', {
+        error: 'Error al cargar el formulario',
+        empleados,
+        proyectos
+      });
     }
   },
 
-  // Muestra el formulario para editar una tarea - SK
-  mostrarFormularioEditar: async (req, res) => {
-
+  // Crea una nueva tarea y actualiza las horas en el proyecto
+  crear: async (req, res) => {
     try {
-      const tareas = await leerDatos(archivoTareas); 
-      const empleados = await leerDatos('./datos/empleados.json');
-      const proyectos = await leerDatos('./datos/proyectos.json');
+      const { 
+        nombre, 
+        descripcion, 
+        horasRegistradas, 
+        horasTrabajadas, 
+        empleadoId, 
+        proyectoId, 
+        estado,
+        prioridad,
+        fecha_vencimiento 
+      } = req.body;
 
-      // Buscamos la tarea a editar
-      const tarea = tareas.find(t => t.id === req.params.id);
-      if (!tarea) {
-        return res.status(404).render('error', { mensajeError: 'Tarea no encontrada' });
+      // Validación básica de campos requeridos
+      if (!prioridad || !fecha_vencimiento) {
+        throw new Error('Prioridad y fecha de vencimiento son requeridos');
       }
+
+      // Crear la tarea con todos los campos
+      const nuevaTarea = new Tarea({
+        nombre,
+        descripcion,
+        horasRegistradas: Number(horasRegistradas) || 0,
+        horasTrabajadas: Number(horasTrabajadas) || 0,
+        empleadoId,
+        proyectoId,
+        estado: estado || 'Pendiente',
+        prioridad,
+        fecha_vencimiento: new Date(fecha_vencimiento)
+      });
+
+      // Guardar la tarea
+      await nuevaTarea.save();
+
+      // Actualizar las horas trabajadas en el proyecto
+      if (proyectoId) {
+        const proyecto = await Proyecto.findById(proyectoId);
+        if (proyecto) {
+          proyecto.horasTrabajadas += Number(horasTrabajadas) || 0;
+          await proyecto.save();
+        }
+      }
+
+      res.redirect('/tareas');
+    } catch (error) {
+      console.error('Error al crear tarea:', error);
+      
+      // Recargar datos necesarios para mostrar el formulario nuevamente
+      const [empleados, proyectos] = await Promise.all([
+        Empleado.find().catch(() => []),
+        Proyecto.find().catch(() => [])
+      ]);
+      
+      res.render('tareas/crear', {
+        error: error.message,
+        empleados,
+        proyectos,
+        datos: req.body // Mantener los datos ingresados por el usuario
+      });
+    }
+  },
+
+  // Muestra el formulario para editar una tarea
+  mostrarFormularioEditar: async (req, res) => {
+    try {
+      const tarea = await Tarea.findById(req.params.id);
+      if (!tarea) {
+        return res.status(404).render('error', {
+          mensajeError: 'Tarea no encontrada'
+        });
+      }
+
+      const [empleados, proyectos] = await Promise.all([
+        Empleado.find(),
+        Proyecto.find()
+      ]);
 
       res.render('tareas/editar', {
         tarea,
@@ -84,100 +135,98 @@ module.exports = {
     }
   },
 
-  // Edita una tarea existente - SK
-editar: async (req, res) => {
-  try {
-    const tareas = await leerDatos(archivoTareas); 
-    
-    const tareasActualizadas = tareas.map(tarea => {
-      return tarea.id === req.params.id ? { ...tarea, ...req.body } : tarea;
-    });
-
-    await guardarTareas(tareasActualizadas);
-    res.redirect('/tareas');
-  } catch (error) {
-    res.render('tareas/editar', { error: true, tarea: req.body });
-  }
-},
-
-  // Crea una nueva tarea
-  crear: async (req, res) => {
-    // Extraemos datos del formulario
-    const { proyectoId, nombre, horasRegistradas, empleadoId } = req.body;
-    
+  // Edita una tarea existente y actualiza las horas en el proyecto
+  editar: async (req, res) => {
     try {
-      // Tenemos tareas existentes
-      const tareas = await leerDatos(archivoTareas);
-      // Agregamos nueva tarea
-      tareas.push(new Tarea(proyectoId, nombre, horasRegistradas, empleadoId));
-      // Guardamos cambios
-      await guardarTareas(tareas);
-      // Nos redirigimos a la lista
+      const { 
+        nombre, 
+        descripcion, 
+        horasRegistradas, 
+        horasTrabajadas, 
+        empleadoId, 
+        proyectoId, 
+        estado,
+        prioridad,
+        fecha_vencimiento 
+      } = req.body;
+
+      // Obtener la tarea original para comparar las horas trabajadas
+      const tareaOriginal = await Tarea.findById(req.params.id);
+
+      // Validación de campos requeridos
+      if (!prioridad || !fecha_vencimiento) {
+        throw new Error('Prioridad y fecha de vencimiento son requeridos');
+      }
+
+      // Actualizar la tarea
+      const tareaActualizada = await Tarea.findByIdAndUpdate(req.params.id, {
+        nombre,
+        descripcion,
+        horasRegistradas: Number(horasRegistradas) || 0,
+        horasTrabajadas: Number(horasTrabajadas) || 0,
+        empleadoId,
+        proyectoId,
+        estado,
+        prioridad,
+        fecha_vencimiento: new Date(fecha_vencimiento)
+      }, { new: true });
+
+      // Actualizar las horas trabajadas en el proyecto si cambió
+      if (proyectoId && tareaOriginal) {
+        const proyecto = await Proyecto.findById(proyectoId);
+        if (proyecto) {
+          const diferenciaHoras = (Number(horasTrabajadas) || 0) - (tareaOriginal.horasTrabajadas || 0);
+          proyecto.horasTrabajadas += diferenciaHoras;
+          await proyecto.save();
+        }
+      }
+
       res.redirect('/tareas');
-    } catch {
-      // Si falla, mostramos formulario con datos ingresados
-      res.render('tareas/crear', { error: true, datos: req.body });
+    } catch (error) {
+      console.error('Error al editar tarea:', error);
+      
+      // Recargar datos para mostrar el formulario de edición nuevamente
+      const [tarea, empleados, proyectos] = await Promise.all([
+        Tarea.findById(req.params.id).catch(() => null),
+        Empleado.find().catch(() => []),
+        Proyecto.find().catch(() => [])
+      ]);
+      
+      res.render('tareas/editar', {
+        error: error.message,
+        tarea: tarea || req.body,
+        empleados,
+        proyectos
+      });
     }
   },
 
-  // Actualiza el estado de una tarea
-  cambiarEstado: async (req, res) => {
-    const { id } = req.params; 
-    const { estado } = req.body;
-    
+  // Elimina una tarea y actualiza las horas trabajadas del proyecto
+  eliminar: async (req, res) => {
     try {
-      const tareas = await leerDatos(archivoTareas);
-      // Buscamos y actualizamos solo la tarea específica
-      const tareasActualizadas = tareas.map(tarea => {
-        if (tarea.id === id) {
-          return { ...tarea, estado };
-        }
-        return tarea;
-      });
+      const tarea = await Tarea.findById(req.params.id);
       
-      // Guardamos los cambios
-      await guardarTareas(tareasActualizadas);
+      if (!tarea) {
+        return res.status(404).render('error', {
+          mensajeError: 'Tarea no encontrada'
+        });
+      }
+
+      // Restar horas del proyecto si existe
+      if (tarea.proyectoId) {
+        const proyecto = await Proyecto.findById(tarea.proyectoId);
+        if (proyecto) {
+          proyecto.horasTrabajadas -= tarea.horasTrabajadas || 0;
+          await proyecto.save();
+        }
+      }
+
+      await Tarea.findByIdAndDelete(req.params.id);
+
       res.redirect('/tareas');
-    } catch {
-      // Si falla, nos redirigimos a la lista
+    } catch (error) {
+      console.error('Error al eliminar tarea:', error);
       res.status(500).redirect('/tareas');
     }
-  },
-
-  // Asigna un empleado a una tarea
-  asignarEmpleado: async (req, res) => {
-    const { id } = req.params; 
-    const { empleadoId } = req.body; 
-    
-    try {
-      const tareas = await leerDatos(archivoTareas);
-      // Buscamos y actualizamos solo la tarea específica
-      const tareasActualizadas = tareas.map(tarea => {
-        if (tarea.id === id) {
-          return { ...tarea, empleadoId };
-        }
-        return tarea;
-      });
-      
-      // Guardamos los cambios
-      await guardarTareas(tareasActualizadas);
-      res.redirect('/tareas');
-    } catch {
-      // Si falla, nos redirigimos a la lista
-      res.status(500).redirect('/tareas');
-    }
-  },
-
-  // Elimina una tarea - SK
-eliminar: async (req, res) => {
-  try {
-    const tareas = await leerDatos(archivoTareas); 
-    const tareasActualizadas = tareas.filter(tarea => tarea.id !== req.params.id);
-    
-    await guardarTareas(tareasActualizadas);
-    res.redirect('/tareas');
-  } catch (error) {
-    res.status(500).redirect('/tareas');
   }
-}
 };

@@ -1,63 +1,153 @@
-//- Página de reportes 
-extends ../layout  
+extends ../layout
 
-block contenido 
+block contenido
+  style.
+    /* Estilos generales para el reporte */
+    .header {
+      margin-bottom: 30px;
+    }
 
-  // Título de la página
-  h1 Reportes del Sistema
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #111827;
+    }
 
-  //  Resumen de horas trabajadas
-  section.reporte-seccion
-    h2 
-      i.fas.fa-clock 
-    .dato-principal
-      p Total registrado: 
-        strong #{totalHoras} horas
+    .header p {
+      font-size: 1rem;
+      color: #6b7280;
+    }
 
-  // Distribución de trabajo por empleado
-  section.reporte-seccion
-    h2 
-      i.fas.fa-users  
-      | Distribución por Desarrollador
-    if tareasPorEmpleado && tareasPorEmpleado.length > 0
-      table.tabla-reportes
-        thead
-          tr
-            th Nombre
-            th Tareas Asignadas
-            th Horas Invertidas
-        tbody
-          each empleado in tareasPorEmpleado
-            tr
-              td= empleado.nombre
-              td= empleado.cantidad
-              td= empleado.horas + ' horas'
-    else
-      p.aviso No se encontraron registros de trabajo
+    /* Estilos para las estadísticas generales */
+    .stats {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
 
-  // Estado de proyectos
-  section.reporte-seccion
-    h2 
-      i.fas.fa-project-diagram
-    if proyectos && proyectos.length > 0
-      table.tabla-reportes
-        thead
-          tr
-            th Nombre del Proyecto
-            th Cliente
-            th Estado Actual
-        tbody
-          each proyecto in proyectos
-            tr
-              td= proyecto.nombre
-              td= proyecto.cliente
-              td
-                span(class=`estado-${proyecto.estado.toLowerCase()}`)= proyecto.estado
-    else
-      p.aviso No hay proyectos en el sistema
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      width: 22%;
+      text-align: center;
+    }
 
-  // Botón de navegación
-  .acciones
-    a.btn.btn-volver(href="/")
-      i.fas.fa-arrow-left
-      | Volver al Inicio
+    .stat-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .stat-card p {
+      font-size: 1.125rem;
+      color: #374151;
+      margin-top: 10px;
+    }
+
+    /* Estilos para la tabla de proyectos */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+
+    table th, table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 1rem;
+    }
+
+    table th {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+
+    table td {
+      color: #374151;
+    }
+
+    /* Estilos para la barra de progreso */
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: #1d4ed8;
+      border-radius: 4px;
+    }
+
+    /* Estilos para las acciones en la tabla */
+    .acciones {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .acciones button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    .acciones button:hover {
+      background-color: #c82333;
+    }
+
+  .header
+    h1= titulo
+    p Gestiona y visualiza los reportes de los proyectos, empleados y tareas.
+
+  // Estadísticas generales
+  .stats
+    .stat-card
+      h3 Proyectos Activos
+      p= proyectosActivos
+
+    .stat-card
+      h3 Proyectos Completados
+      p= proyectosCompletados
+
+    .stat-card
+      h3 Horas Trabajadas
+      p= horasTrabajadasTotales
+
+    .stat-card
+      h3 Eficiencia del Equipo
+      p= eficienciaEquipo + '%'
+
+  // Tabla de proyectos
+  table
+    thead
+      tr
+        th Nombre
+        th Progreso
+        th Horas Registradas
+        th Horas Trabajadas
+        th Estado
+        th Acciones
+    tbody
+      each proyecto in resumenProyectos
+        tr
+          td= proyecto.nombre
+          td
+            .progress-bar-container
+              .progress-bar(style=`width: ${proyecto.progreso || 0}%`)
+          td= proyecto.horasRegistradas || 0
+          td= proyecto.horasTrabajadas || 0
+          td= proyecto.estado
+          td
+            .acciones
+              a(href=`/proyectos/eliminar/${proyecto._id}`)
+                button Eliminar

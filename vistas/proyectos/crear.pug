@@ -1,38 +1,149 @@
-//- Interfaz para que usuarios registren nuevos proyectos
-extends ../layout  
-block contenido  
+extends ../layout
 
-  // Título del formulario
-  h1 Nuevo Proyecto
-  
-  // Formulario que envía datos a proyectos por método POST
-  form(method="POST" action="/proyectos").mt-3
-    
-    // Grupo para el campo Nombre
-    .form-group.mb-3
-      label(for="nombre") Nombre:
-      input.form-control(
-        type="text" 
-        name="nombre" 
-        required  // Campo obligatorio
-      )
-    
-    // Grupo para el campo Descripción
-    .form-group.mb-3
-      label(for="descripcion") Descripción:
-      textarea.form-control(
-        name="descripcion" 
-        required  // Campo obligatorio
-      )
-    
-    // Grupo para el campo Cliente
-    .form-group.mb-3
-      label(for="cliente") Cliente:
-      input.form-control(
-        type="text" 
-        name="cliente" 
-        required  // Campo obligatorio
-      )
-    
-    // Botón para enviar el formulario
-    button.btn.btn-primary(type="submit") Crear Proyecto
+block contenido
+  style.
+    .modal-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 2rem;
+    }
+
+    .modal {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    .modal h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .modal p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      color: #374151;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #0f172a;
+      background-color: #fff;
+    }
+
+    .acciones {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-cancelar {
+      background-color: #f3f4f6;
+      color: #374151;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      border: none;
+    }
+
+    .btn-enviar {
+      background-color: #2563eb;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-enviar:hover {
+      background-color: #1d4ed8;
+    }
+
+  .modal-wrapper
+    .modal
+      h2 Crear Nuevo Proyecto
+      p Llena los detalles para crear un nuevo proyecto
+
+      if error
+        .error(style="color:red")= error
+
+      form(method="POST" action="/proyectos")
+        .form-row
+          .form-group
+            label(for="nombre") Nombre del Proyecto
+            input(type="text" name="nombre" placeholder="Ej: Nueva App Web" required)
+
+        .form-group
+          label(for="descripcion") Descripción
+          textarea(name="descripcion" rows="3" placeholder="Describe el proyecto..." required)
+
+          .form-group
+            label(for="fechaInicio") Fecha de Inicio
+            input(type="date" name="fechaInicio" required)
+
+          .form-group
+            label(for="fechaFin") Fecha de Fin
+            input(type="date" name="fechaFin" required)
+
+        .form-row
+          .form-group
+            label(for="estado") Estado
+            select(name="estado" required)
+              option(value="En progreso") En progreso
+              option(value="Completado") Completado
+              option(value="Pausado") Pausado
+
+          .form-group
+            label(for="progreso") Progreso (%)
+            input(type="number" name="progreso" min="0" max="100" value="0")
+
+        .form-row
+          .form-group
+            label(for="horasRegistradas") Horas Registradas
+            input(type="number" name="horasRegistradas" min="0" value="0")
+
+          .form-group
+            label(for="horasTrabajadas") Horas Trabajadas
+            input(type="number" name="horasTrabajadas" min="0" value="0")
+
+        .acciones
+          a.btn-cancelar(href="/proyectos") Cancelar
+          button.btn-enviar(type="submit") Crear Proyecto
