@@ -86,7 +86,7 @@ app.use((err, req, res, next) => {
 });
 
 // 🔹 Inicio del servidor
-const PUERTO = process.env.PUERTO || 5000;
+const PUERTO = process.env.PUERTO || 3000;
 app.listen(PUERTO, () => {
   console.log(`Servidor corriendo en: http://localhost:${PUERTO}`);
   console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
