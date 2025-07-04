@@ -55,17 +55,15 @@ app.use((req, res, next) => {
 // 🔹 Rutas públicas
 app.use('/api/auth', authJwtRoutes);   // Registro / Login con JWT (API)
 app.use('/auth', rutasAuth);           // Login tradicional (formulario)
-
+app.use('/', rutasPrincipales);        // Página de inicio
 
 // 🔹 Rutas protegidas por JWT (API)
-app.use('/', rutasPrincipales);        // Página de inicio
 app.use('/api/proyectos', jwtAuth, rutasProyectos);
 app.use('/api/empleados', jwtAuth, rutasEmpleados);
 app.use('/api/tareas', jwtAuth, rutasTareas);
 app.use('/api/reportes', jwtAuth, rutasReportes);
 
 // 🔹 Rutas protegidas tradicionales (vistas con sesiones)
-app.use('/', authMiddleware, rutasPrincipales);  
 app.use('/proyectos', authMiddleware, rutasProyectos);
 app.use('/empleados', authMiddleware, rutasEmpleados);
 app.use('/tareas', authMiddleware, rutasTareas);
